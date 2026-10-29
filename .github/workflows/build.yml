@@ -146,6 +146,7 @@ jobs:
       - run: |
           docker run \
             --pull never \
+            --name fider \
             -p 3000:3000 \
             --env DATABASE_URL=postgres://fider_ci:fider_ci_pw@postgres:5432/fider_ci?sslmode=disable \
             --env JWT_SECRET=not_so_secret \
@@ -166,6 +167,9 @@ jobs:
       - run: make test-e2e-ui
         env:
           BROWSER: ${{ matrix.browser }}
+      - name: remove fider container
+        if: always()
+        run: docker rm -f fider || true
 
   test-e2e-server:
     name: test-e2e-server
@@ -201,6 +205,7 @@ jobs:
       - run: |
           docker run \
             --pull never \
+            --name fider \
             -p 3000:3000 \
             -p 4000:4000 \
             --env DATABASE_URL=postgres://fider_ci:fider_ci_pw@postgres:5432/fider_ci?sslmode=disable \
@@ -223,3 +228,6 @@ jobs:
       - run: make test-e2e-server
         env:
           BROWSER: chromium
+      - name: remove fider container
+        if: always()
+        run: docker rm -f fider || true
